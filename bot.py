@@ -11,7 +11,12 @@ from datetime import datetime
 
 # ====== Настройки ======
 BOT_TOKEN = os.getenv("BOT_TOKEN")       # Токен бота
-ADMIN_ID = int(os.getenv("ADMIN_ID"))    # Telegram ID администратора
+ADMIN_ID = os.getenv("ADMIN_ID")         # Telegram ID администратора
+
+if not BOT_TOKEN:
+    raise ValueError("❌ Переменная BOT_TOKEN не задана!")
+
+ADMIN_ID = int(ADMIN_ID) if ADMIN_ID and ADMIN_ID.isdigit() else None
 
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher(storage=MemoryStorage())
@@ -75,20 +80,13 @@ async def ask_game_id(message: types.Message, state: FSMContext):
         "💻✍🏻 Отправь свой ID из CPM."
     )
 
-# === ✅ ИЗМЕНЁННЫЙ участок ===
 @dp.message(Form.game_id)
 async def ask_screenshot(message: types.Message, state: FSMContext):
     await state.update_data(game_id=message.text)
     await state.set_state(Form.screenshot)
-
-    # ✅ Бот сначала отправляет пример изображения + надпись под ним
-    await bot.send_photo(
-        message.chat.id,
-        photo=open("example.jpg", "rb"),  # положи example.jpg рядом с bot.py
-        caption="📸 Отлично! Теперь отправь **такой же скрин** из своего профиля CPM 👆🏻"
+    await message.answer(
+        "📸 Отлично! Теперь отправь скриншот из своего профиля CPM 👇🏻"
     )
-
-# ===========================
 
 @dp.message(Form.screenshot, F.photo)
 async def finish_form(message: types.Message, state: FSMContext):
@@ -153,8 +151,9 @@ async def process_reject(callback: types.CallbackQuery):
     except Exception as e:
         print(f"Не удалось отправить сообщение пользователю {user_id}: {e}")
 
+# ====== Запуск ======
 async def main():
-    await start_web()
+    asyncio.create_task(start_web())  # запускаем web-сервер параллельно
     print("🤖 Бот запущен и работает 24/7")
     await dp.start_polling(bot)
 
