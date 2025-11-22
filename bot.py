@@ -18,7 +18,7 @@ if not BOT_TOKEN:
 
 ADMIN_ID = int(ADMIN_ID) if ADMIN_ID and ADMIN_ID.isdigit() else None
 
-GROUP_LINK = "https://t.me/+e8m9zn85h4c2YmVi"  # 🔗 Ссылка на группу ожидания
+GROUP_LINK = "https://t.me/+xrrUQ1B88IMwOTQy"  # 🔗 Новая ссылка на группу ожидания
 
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher(storage=MemoryStorage())
@@ -144,7 +144,7 @@ async def process_approve(callback: types.CallbackQuery):
     except Exception as e:
         print(f"Не удалось отправить сообщение пользователю {user_id}: {e}")
 
-# ✅ Обновлённое сообщение при отклонении заявки
+# ====== Сообщение при отклонении ======
 @dp.callback_query(lambda c: c.data and c.data.startswith("reject:"))
 async def process_reject(callback: types.CallbackQuery):
     user_id = int(callback.data.split(":")[1])
@@ -167,7 +167,7 @@ async def process_reject(callback: types.CallbackQuery):
     except Exception as e:
         print(f"Не удалось отправить сообщение пользователю {user_id}: {e}")
 
-# ✅ Обработка ответа пользователя
+# ====== Ответ «Да» — отправить ссылку ======
 @dp.callback_query(lambda c: c.data and c.data.startswith("join_wait:"))
 async def join_wait_group(callback: types.CallbackQuery):
     user_id = int(callback.data.split(":")[1])
